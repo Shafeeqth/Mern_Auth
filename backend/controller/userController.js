@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js'
 import generateToken from '../utils/generateToken.js';
 
+
 /**
  * @desc Auth user/set token 
  * route POST /api/users/auth
@@ -86,8 +87,12 @@ export const logoutUser = asyncHandler((req, res) => {
  * @access Private
  */
 export const getUserProfile = asyncHandler((req, res) => {
-
-    res.status(200).json({ message: "User User" });
+    let user = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+    }
+    res.status(200).json(user);
 
 });
 /**
@@ -95,8 +100,24 @@ export const getUserProfile = asyncHandler((req, res) => {
  * route Put /api/users/auth
  * @access Private
  */
-export const updateUserProfile = asyncHandler((req, res) => {
+export const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
 
-    res.status(200).json({ message: "Update user profile" });
+    if(!user) {
+        res.status(404);
+        new Error('User not Found');
+    }
+    user.name = req.body.name || user.name;
+    user.email = req.body || user.email;
+    if(req.body.password) {
+        user.password = req.body.password;
+    }
+
+    const updatedUser = await user.save();
+    res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+     });
 
 });
