@@ -1,11 +1,27 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
+import { useSelector, useDispatch } from "react-redux";
+import { useLoginMutation } from "../store/slices/usersApiSlice";
+import { setCredentials } from "../store/slices/authSlice";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if(userInfo) {
+        navigate('/');
+    }
+  },[navigate, userInfo]);
+
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -37,14 +53,13 @@ const LoginScreen = () => {
         </Form.Group>
 
         <Button type="submit" variant="primary" className="mt-3">
-            Sign In
+          Sign In
         </Button>
         <Row>
-            <Col>
+          <Col>
             New Customer? <Link to="/register">Register</Link>
-            </Col>
+          </Col>
         </Row>
-
       </Form>
     </FormContainer>
   );
