@@ -5,6 +5,8 @@ import FormContainer from "../components/FormContainer";
 import { useSelector, useDispatch } from "react-redux";
 import { useLoginMutation } from "../store/slices/usersApiSlice";
 import { setCredentials } from "../store/slices/authSlice";
+import { toast } from "react-toastify";
+
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -17,15 +19,20 @@ const LoginScreen = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if(userInfo) {
-        navigate('/');
+    if (userInfo) {
+      navigate("/");
     }
-  },[navigate, userInfo]);
+  }, [navigate, userInfo]);
 
-
-  const submitHandler = (e) => {
+  const submitHandler = async function (e) {
     e.preventDefault();
-    console.log("submitted");
+    try {
+      const res = await login({ email, password }).unwrap();
+      dispatch(setCredentials({ ...res }));
+      navigate("/");
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
+    }
   };
   return (
     <FormContainer>
