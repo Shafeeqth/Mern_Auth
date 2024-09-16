@@ -58,10 +58,11 @@ const LoginScreen = () => {
             onChange={(e) => setPassword(e.target.value)}
           ></Form.Control>
         </Form.Group>
-
+        {isLoading && <h1>Loading</h1>}
         <Button type="submit" variant="primary" className="mt-3">
           Sign In
         </Button>
+
         <Row>
           <Col>
             New Customer? <Link to="/register">Register</Link>
