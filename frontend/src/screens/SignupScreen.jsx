@@ -1,7 +1,12 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
+import { toast } from "react-toastify";
+import Loader from "../components/Loader";
+import { useSelector, useDispatch } from "react-redux";
+import { useRegisterMutation } from "../store/slices/usersApiSlice";
+import { setCredentials } from "../store/slices/authSlice";
 
 const SignupScreen = () => {
   const [email, setEmail] = useState("");
@@ -9,9 +14,31 @@ const SignupScreen = () => {
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const submitHandler = (e) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [register, { isLoading }] = useRegisterMutation();
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [navigate, userInfo]);
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-    console.log("submitted");
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+    } else {
+      try {
+        const res = await register({ name, email, password }).unwrap();
+        dispatch(setCredentials({ ...res }));
+        navigate("/");
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
+    }
   };
   return (
     <FormContainer>
@@ -23,7 +50,7 @@ const SignupScreen = () => {
           <Form.Control
             type="text"
             placeholder="Enter Name"
-            value={email}
+            value={name}
             onChange={(e) => setName(e.target.value)}
           ></Form.Control>
         </Form.Group>
@@ -57,16 +84,16 @@ const SignupScreen = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           ></Form.Control>
         </Form.Group>
+        {isLoading && <Loader/>}
 
         <Button type="submit" variant="primary" className="mt-3">
-            Sign Up
+          Sign Up
         </Button>
         <Row>
-            <Col>
-            Already have an Account? <Link to="/login">Register</Link>
-            </Col>
+          <Col>
+            Already have an Account? <Link to="/login">Login</Link>
+          </Col>
         </Row>
-
       </Form>
     </FormContainer>
   );
