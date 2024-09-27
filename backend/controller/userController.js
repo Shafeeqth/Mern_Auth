@@ -22,6 +22,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password,
+        role: 'USER'
     });
 
     if (user) {
@@ -56,7 +57,8 @@ export const authUser = asyncHandler(async (req, res) => {
         return res.status(201).json({
             _id: user._id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            profileImage: user.profileImage,
 
         });
     } else {
