@@ -1,7 +1,8 @@
 import JWT from "jsonwebtoken";
 import User from "../models/userModel";
 
-export const adminAuth = async (req, res, next) => {
+
+export const adminAuth = asyncHandler(async (req, res, next) => {
     let adminToken = req.cookies.adminToken;
     if (!adminAuth) {
         return res.status(403)
@@ -27,5 +28,5 @@ export const adminAuth = async (req, res, next) => {
         
     }
 
-}
+}); 
 
