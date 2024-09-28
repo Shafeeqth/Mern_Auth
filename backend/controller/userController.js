@@ -22,11 +22,11 @@ export const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password,
-        role: 'USER'
+       
     });
 
     if (user) {
-        generateToken(res, user._id);
+        generateToken(res, user._id,'userToken');
 
         return res.status(201).json({
             _id: user._id,

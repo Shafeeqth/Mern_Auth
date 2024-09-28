@@ -11,7 +11,7 @@ import jwt from 'jsonwebtoken';
             issuer: 'shafeeq.com'
         });
         
-        res.cookie('jwt', token, {
+        res.cookie(role+'-jwt', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
             sameSite: 'strict', 
