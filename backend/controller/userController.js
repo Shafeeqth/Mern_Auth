@@ -4,8 +4,8 @@ import generateToken from '../utils/generateToken.js';
 
 
 /**
- * @desc Auth user/set token 
- * route POST /api/users/auth
+ * @desc Register user
+ * route POST /api/users
  * @access Public
  */
 export const registerUser = asyncHandler(async (req, res) => {
@@ -22,11 +22,11 @@ export const registerUser = asyncHandler(async (req, res) => {
         name,
         email,
         password,
-       
+
     });
 
     if (user) {
-        generateToken(res, user._id,'userToken');
+        generateToken(res, user._id, 'userToken');
 
         return res.status(201).json({
             _id: user._id,
@@ -41,11 +41,13 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 
 });
+
 /**
- * @desc Register user
- * route POST /api/users
+ * @desc Auth user/set token 
+ * route POST /api/users/auth
  * @access Public
  */
+
 export const authUser = asyncHandler(async (req, res) => {
 
     const { email, password } = req.body;
@@ -75,12 +77,12 @@ export const authUser = asyncHandler(async (req, res) => {
  * @access Public
  */
 export const logoutUser = asyncHandler((req, res) => {
-        res.cookie('jwt', '',{
-            httpOnly: true,
-            expires: new Date(0)
-        });
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        expires: new Date(0)
+    });
 
-        res.status(200).json({ message: "User Loggedout" });
+    res.status(200).json({ message: "User Loggedout" });
 
 });
 /**
@@ -105,21 +107,27 @@ export const getUserProfile = asyncHandler((req, res) => {
 export const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
 
-    if(!user) {
+    if (!user) {
         res.status(404);
         new Error('User not Found');
-    }
-    user.name = req.body.name || user.name;
-    user.email = req.body || user.email;
-    if(req.body.password) {
-        user.password = req.body.password;
-    }
 
-    const updatedUser = await user.save();
-    res.status(200).json({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-     });
+        user.name = req.body.name || user.name;
+        user.email = req.body || user.email;
+        if (req.body.password) {
+            user.password = req.body.password;
+        }
+
+        const updatedUser = await user.save();
+        res.status(200).json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            profileImage: updatedUser.profileImage,
+        });
+    } else {
+        res.status(404)
+        throw new Error('User not found')
+
+    }
 
 });
